@@ -172,3 +172,11 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+#data
+logs
+dataset
+dataloader
+data
+MNIST
+p10
