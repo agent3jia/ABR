@@ -177,6 +177,6 @@ cython_debug/
 logs
 dataset
 dataloader
-data
+demo/data
 MNIST
 p10
