@@ -121,24 +121,18 @@ class ABRProcessorTorch:
     def load_dataset(self, data_dir: str) -> Tuple[np.ndarray, np.ndarray]:
         """递归加载完整数据集（包括子目录）"""
         X, y = [], []
-
-        for label, class_id in self.classes.items():
-            class_dir = os.path.join(data_dir, label)
-            if not os.path.isdir(class_dir):
-                continue
-
-            # 递归遍历所有子目录和文件
-            for root, dirs, files in os.walk(class_dir):
-                for filename in files:
-                    if filename.endswith('.xml'):
-                        file_path = os.path.join(root, filename)
-                        try:
-                            voltage, sr = self.load_single_file(file_path)
-                            processed = self.preprocess(voltage, sr)
-                            X.append(processed)
-                            y.append(class_id)
-                        except Exception as e:
-                            print(f"Error processing {file_path}: {str(e)}")
+        # 递归遍历所有子目录和文件
+        for root, dirs, files in os.walk(data_dir):
+            for filename in files:
+                if filename.endswith('.xml'):
+                    file_path = os.path.join(root, filename)
+                    try:
+                        voltage, sr = self.load_single_file(file_path)
+                        processed = self.preprocess(voltage, sr)
+                        X.append(processed)
+                        # y.append(class_id)
+                    except Exception as e:
+                        print(f"Error processing {file_path}: {str(e)}")
 
         return np.array(X), np.array(y)
 
