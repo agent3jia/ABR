@@ -120,11 +120,19 @@ if __name__ == "__main__":
     loaded_data = analyzer.load_from_folder(r"C:\ABR\data\hearlab\ABRI02R", plot_each=True)
 
     # 也可以选择不自动绘图，后续手动处理
-    # loaded_data = analyzer.load_from_folder("path/to/hearlab_xmls", plot_each=False)
-    # for data in loaded_data:
-    #     analyzer.time = data["time"]
-    #     analyzer.voltage = data["voltage"]
-    #     analyzer.sample_rate = data["sample_rate"]
-    #     v_waves = analyzer.detect_v_waves()
-    #     peaks = analyzer.label_peaks()
+    data_list = []
+    label_list = []
+    loaded_data = analyzer.load_from_folder("path/to/hearlab_xmls", plot_each=False)
+    for data in loaded_data:
+        analyzer.time = data["time"]
+        analyzer.voltage = data["voltage"]
+        analyzer.sample_rate = data["sample_rate"]
+        data_list.append(data["time"])
+        label_list.append(0/1) # 0 means w/o wave V
+        v_waves = analyzer.detect_v_waves()
+        peaks = analyzer.label_peaks()
     #     analyzer.plot(v_waves=v_waves, peaks=peaks, title=f"ABR Analysis: {data['filename']}")
+    data_list = np.arrray(data_list)
+    label_list = np.array(label_list)
+    np.save("data_x.npy", data_list)
+    np.save("data_y.npy",label_list)
