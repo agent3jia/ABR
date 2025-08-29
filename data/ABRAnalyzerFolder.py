@@ -17,12 +17,15 @@ class ABRAnalyzerFolder:
 
     def load_from_folder(self, folder_path: str, plot_each: bool = True) -> List[Dict[str, np.ndarray]]:
         """
+        file_name: [waveV]_Rerun R_[type]_dB.xml
+        
         批量加载文件夹内的 hearlab 格式 XML 文件，并可选择是否绘制每个文件的波形
 
         :param folder_path: 包含 XML 文件的文件夹路径
         :param plot_each: 是否对每个文件单独绘制波形（默认 True）
         :return: 成功加载的文件数据列表 [{"time": ndarray, "voltage": ndarray, "sample_rate": float}]
         """
+        type_map = {'500':0,'1k':1, '2k':2, '4k':3, 'Click':4, 'Non':5}
         loaded_data = []
         for filename in os.listdir(folder_path):
             if filename.endswith(".xml"):
@@ -36,7 +39,10 @@ class ABRAnalyzerFolder:
                         "filename": filename,
                         "time": self.time.copy(),
                         "voltage": self.voltage.copy(),
-                        "sample_rate": self.sample_rate
+                        "sample_rate": self.sample_rate,
+                        "type":type_map[filename.split("_")[2]],
+                        # "label":int(filename.split("_")[0]),
+                        "dB":int(''.join(filter(str.isdigit, filename.split("_")[-1]))) 
                     }
                     loaded_data.append(file_data)
 
@@ -112,12 +118,38 @@ class ABRAnalyzerFolder:
         plt.show()
 
 
-# 使用示例
 if __name__ == "__main__":
     analyzer = ABRAnalyzerFolder()
+    data_list = []
+    label_list = []
+    type_list = []
+    dB_list = []
+    folder_path = "C:\ABR\data\hearlab"
+    # loaded_data = analyzer.load_from_folder(, plot_each=True)
+    for foldername in os.listdir("C:\ABR\data\hearlab"):
+        print(foldername)
+        p_path = folder_path +"\\" + foldername
+        loaded_data = analyzer.load_from_folder(p_path, plot_each=False)
+        for data in loaded_data:
+            analyzer.time = data["time"]
+            analyzer.voltage = data["voltage"]
+            data_list.append(data["voltage"])
+            type_list.append(data["type"])
+            dB_list.append(data["dB"])
+    data_list = np.array(data_list)
+    np.save("data_x.npy", data_list)
+    dB_list = np.array(dB_list)
+    type_list = np.array(type_list)
+    np.save("data_x_type.npy", type_list)
+    np.save("data_x_dB.npy", dB_list)
+    
 
-    # 加载文件夹并自动绘制每个文件的波形
-    loaded_data = analyzer.load_from_folder(r"C:\ABR\data\hearlab\ABRI02R", plot_each=True)
+# # 使用示例
+# if __name__ == "__main__":
+#     analyzer = ABRAnalyzerFolder()
+
+#     # 加载文件夹并自动绘制每个文件的波形
+#     loaded_data = analyzer.load_from_folder(r"C:\ABR\data\hearlab\ABRI02R", plot_each=True)
 
     # 也可以选择不自动绘图，后续手动处理
     # loaded_data = analyzer.load_from_folder("path/to/hearlab_xmls", plot_each=False)
